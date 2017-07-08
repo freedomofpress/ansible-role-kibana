@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: msheiny
+  description: Kibana installation
+  license: "MIT"
+  min_ansible_version: 2.3
+  platforms:
+  - name: Debian
+    versions:
+    - jessie
+  galaxy_tags:
+    - monitoring

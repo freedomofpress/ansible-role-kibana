@@ -1,0 +1,23 @@
+---
+- hosts: all
+  pre_tasks:
+    - block:
+      - apt:
+          name: paxctld
+      - lineinfile:
+          regexp: "^/usr/share/kibana/node/bin/node"
+          path: /etc/paxctld.conf
+          line: "/usr/share/kibana/node/bin/node  m"
+      - service:
+          name: paxctld
+          state: restarted
+      when: ansible_kernel.endswith('grsec')
+  roles:
+    - role: freedomofpress.kibana
+  vars:
+    kibana_config_es:
+      elasticsearch.url: "http://esserver:9200"
+      elasticsearch.preserveHost: true
+      elasticsearch.requestTimeout: 30000
+    kibana_config_server:
+      server.host: "0.0.0.0"

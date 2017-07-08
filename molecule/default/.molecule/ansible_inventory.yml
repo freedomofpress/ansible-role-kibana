@@ -1,0 +1,11 @@
+# Molecule managed
+
+---
+all:
+  hosts:
+    kibana_role-default: &id001
+      ansible_connection: docker
+ungrouped:
+  hosts:
+    kibana_role-default: *id001
+  vars: {}

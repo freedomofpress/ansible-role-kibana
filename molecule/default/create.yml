@@ -1,0 +1,45 @@
+---
+- hosts: localhost
+  connection: local
+  vars:
+    molecule_file: "{{ lookup('env', 'MOLECULE_FILE') }}"
+    molecule_ephemeral_directory: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}"
+    molecule_scenario_directory: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}"
+    molecule_yml: "{{ lookup('file', molecule_file) | from_yaml }}"
+    docker_config: "{{ lookup('file', 'docker_hashes.yml') | from_yaml }}"
+  tasks:
+    - name: Start up Elasticsearch
+      docker_container:
+        name: kibana_role_elasticsearch
+        image: "quay.io/freedomofpress/elasticsearch-with-paxflags@{{ docker_config['elasticsearch'] }}"
+        state: started
+        exposed_ports:
+          - 9200
+        env:
+          xpack.security.enabled: "false"
+          xpack.monitoring.enabled: "false"
+          http.cors.allow-origin: "http://localhost:1358"
+          http.cors.enabled: "true"
+          http.cors.allow-credentials: "true"
+          http.cors.allow-headers : "X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization"
+          http.host: 0.0.0.0
+          transport.host: 127.0.0.1
+          discovery.type: "single-node"
+
+    - name: Create molecule instance(s)
+      docker_container:
+        name: "{{ molecule_file | molecule_instance_with_scenario_name(item.name) }}"
+        hostname: "{{ molecule_file | molecule_instance_with_scenario_name(item.name) }}"
+        image: "{{ item.image }}@{{ docker_config[item.image] }}"
+        state: started
+        recreate: False
+        log_driver: syslog
+        command: "{{ item.command | default(omit)}}"
+        privileged: "{{ item.privileged | default(omit) }}"
+        volumes: "{{ item.volumes | default(omit) }}"
+        capabilities: "{{ item.capabilities | default(omit) }}"
+        links:
+          kibana_role_elasticsearch:esserver
+        published_ports: "{{ item.published_ports | default(omit) }}"
+        exposed_ports: "{{ item.exposed_ports | default(omit) }}"
+      with_items: "{{ molecule_yml.platforms }}"

@@ -1,0 +1,28 @@
+---
+- name: Ensure package dependencies are installed
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ ['apt-transport-https']+kibana_pkg_deps }}"
+
+- name: Add Elastics apt key
+  apt_key:
+    id: "{{ kibana_elastic_pgp }}"
+    keyserver: "{{ kibana_pgp_keyserver }}"
+
+- name: Add Elastic repository
+  apt_repository:
+    repo: '{{ kibana_elastic_repo }}'
+    state: present
+    update_cache: "yes"
+
+- name: Install Kibana
+  apt:
+    name: "{{ kibana_pkg_name }}={{ kibana_version }}"
+  notify: restart kibana
+
+- name: Optionally lock version
+  dpkg_selections:
+    name: "{{ kibana_pkg_name }}"
+    selection: hold
+  when: kibana_pkg_lock
