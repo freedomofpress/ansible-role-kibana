@@ -1,3 +1,14 @@
+freedomofpress.kibana
+=====================
+
+[![CircleCI](https://circleci.com/gh/freedomofpress/ansible-role-kibana.svg?style=svg&circle-token=95f31e6b9e0e8b11b68ec29b8fc54537c46841f3)](https://circleci.com/gh/freedomofpress/ansible-role-kibana)
+
+Ansible role to install and configure kibana. 
+
+Role Variables
+--------------
+
+```
 ---
 # Packaging options
 kibana_major_version: "5.x"
@@ -49,3 +60,29 @@ kibana_config_logging:
   logging.verbose: false
 
 kibana_config: "{{ kibana_config_es|combine(kibana_config_server)|combine(kibana_config_misc)|combine(kibana_config_logging) }}"
+```
+
+Dependencies
+------------
+
+This is one piece of an ELK deployment. I advise that you seek other for elasticsearch and logstash.
+
+Example Playbook
+----------------
+
+Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+
+    - hosts: servers
+      roles:
+         - role: freedomofpress.kibana
+
+License
+-------
+
+MIT
+
+Author Information
+------------------
+
+Michael Sheinberg <@msheiny>
+Freedom of the Press Foundation

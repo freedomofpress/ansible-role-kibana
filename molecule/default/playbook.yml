@@ -2,15 +2,18 @@
 - hosts: all
   pre_tasks:
     - block:
-      - apt:
-          name: paxctld
-      - lineinfile:
-          regexp: "^/usr/share/kibana/node/bin/node"
-          path: /etc/paxctld.conf
-          line: "/usr/share/kibana/node/bin/node  m"
-      - service:
-          name: paxctld
-          state: restarted
+        - name: Install paxctld
+          apt:
+            name: paxctld
+        - name: Lay down pax flags for node
+          lineinfile:
+            regexp: "^/usr/share/kibana/node/bin/node"
+            path: /etc/paxctld.conf
+            line: "/usr/share/kibana/node/bin/node  m"
+        - name: paxctld start service
+          service:
+            name: paxctld
+            state: restarted
       when: ansible_kernel.endswith('grsec')
   roles:
     - role: freedomofpress.kibana
