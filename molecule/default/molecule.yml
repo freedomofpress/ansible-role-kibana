@@ -5,6 +5,8 @@ driver:
   name: docker
 lint:
   name: yamllint
+  options:
+    config-file: molecule/lint.yml
 platforms:
   - name: kibana_role
     image: quay.io/freedomofpress/debian-jessie-systemd
